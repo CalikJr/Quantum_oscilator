@@ -4,11 +4,11 @@ from matplotlib import animation
 import math
 
 def osc(x):
-    return x**2
+    return (x)**2
 
 x_min = -15#float(input())
 x_max = 15#float(input())
-no = 1000#int(input())
+no = 500#int(input())
 rm = 4
 
 step = (x_max-x_min)/no
@@ -34,8 +34,8 @@ print(E[rm])
 #plt.show()
 vects=vects/2
 
-a=3
-sigma=3
+a=0.5
+sigma=1
 P=numpy.array([])
 for x in Grid:
     P=numpy.append(P, (1/(sigma*math.sqrt(2*math.pi)))*math.exp(-0.5*((x-a)/sigma)**2))
@@ -45,7 +45,7 @@ plt.plot(Grid, P)
 plt.show()
 c_const=numpy.array([])
 for i in range(no):
-    c_const=numpy.append(c_const, numpy.dot(P, vects[:,i]))
+    c_const=numpy.append(c_const, step*numpy.dot(P, vects[:,i]))
 #print(c_const.size)
 #print(c_const)
 
@@ -54,8 +54,8 @@ def packet_state(t):
     for i in range(no):
         sum=0
         for j in range(no):
-            sum+=c_const[j]*(math.cos(E[j]*t)+math.sin(E[j]*t))*vects[i, j]
-        Packet=numpy.append(Packet, sum)
+            sum+=c_const[j]*(math.cos(E[j]*t)+1j*math.sin(E[j]*t))*vects[i, j]
+        Packet=numpy.append(Packet, abs(sum))
     #print(Packet.size)
     #print(Packet.shape)
     return Packet
@@ -65,15 +65,15 @@ def packet_state(t):
 t_final = 10.0
 t_initial = 0.0
 t = t_initial
-dt = 0.1
+dt = 1
 
 fig, ax = plt.subplots()
 ax.set_xlabel('x')
 ax.set_ylabel('P')
 plotLine, = ax.plot(Grid, numpy.zeros(len(Grid))*numpy.NaN, 'r-')
 plotTitle = ax.set_title("t=0")
-ax.set_ylim(-0.3,0.3)
-ax.set_xlim(x_min,x_max)
+ax.set_ylim(-0.01,0.01)
+ax.set_xlim(-5,5)
 
 def animate(t):
     pp = packet_state(t)
@@ -86,4 +86,5 @@ def animate(t):
 
 
 ani = animation.FuncAnimation(fig, func=animate, frames=numpy.arange(t_initial, t_final+dt, dt), blit=True)
+plt.plot(Grid, osc(Grid))
 plt.show()
